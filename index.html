@@ -2,29 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>RezKai-X | Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RezKai-X | AI Trading Tools</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #000;
+      color: #fff;
+    }
+    header {
+      background: #111;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #222;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00ffcc;
+    }
+    nav a {
+      color: #ccc;
+      margin: 0 15px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav a:hover {
+      color: #00ffcc;
+    }
+    .login-btn {
+      background: #00ffcc;
+      color: #000;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .hero {
+      padding: 80px 40px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: #aaa;
+    }
+    footer {
+      background: #111;
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid #222;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>RezKai-X</h1>
+    <div class="logo">RezKai-X</div>
     <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="#">Calculator</a></li>
-        <li><a href="#">Dashboard</a></li>
-        <li><a href="#">About</a></li>
-      </ul>
+      <a href="#">Home</a>
+      <a href="#">Calculator</a>
+      <a href="#">Dashboard</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
     </nav>
+    <button class="login-btn">Login</button>
   </header>
 
-  <main>
-    <h2>Welcome to RezKai-X</h2>
-    <p>Your AI-powered trading assistant starts here 💻🚀</p>
-  </main>
+  <section class="hero">
+    <h1>AI-Powered Trading Dashboard</h1>
+    <p>Advanced risk tools. Real-time analysis. Built by traders, for traders.</p>
+  </section>
 
   <footer>
-    <p>© 2025 RezKai-X. Built with ❤️ by Reza & Kaiden</p>
+    &copy; 2025 RezKai-X. All rights reserved.
   </footer>
 </body>
 </html>

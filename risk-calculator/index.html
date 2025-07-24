@@ -2,125 +2,148 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RezKai-X Risk Calculator</title>
   <style>
     body {
-      background-color: #0d0d0d;
-      color: #f5f5f5;
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      background-color: #0e0e0e;
+      font-family: 'Segoe UI', sans-serif;
+      color: #f1f1f1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
     }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #1a1a1a;
+    .calculator {
+      background: #1a1a1a;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 255, 200, 0.1);
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 0 10px #000;
     }
     h2 {
       text-align: center;
-      color: #00ffc8;
+      margin-bottom: 20px;
+      color: #0ff;
     }
     label {
       display: block;
-      margin-top: 20px;
+      margin: 10px 0 5px;
+      font-weight: bold;
+      color: #ccc;
     }
-    input, select {
+    select, input {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
-      background: #333;
-      color: #fff;
       border: none;
       border-radius: 6px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 16px;
+      margin-bottom: 15px;
     }
     button {
-      margin-top: 20px;
       width: 100%;
       padding: 12px;
-      background-color: #00ffc8;
+      background: #0ff;
       color: #000;
       font-weight: bold;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      font-size: 16px;
     }
-    .result {
+    .results {
       margin-top: 20px;
+      font-size: 17px;
+      background: #111;
       padding: 15px;
-      background-color: #111;
-      border-left: 4px solid #00ffc8;
+      border-radius: 8px;
+    }
+    .results div {
+      margin: 8px 0;
+    }
+    .warn {
+      color: red;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Risk Calculator</h2>
-    <label for="symbol">Trading Symbol:</label>
+  <div class="calculator">
+    <h2>🎯 RezKai-X Risk Calculator</h2>
+
+    <label>Trading Symbol</label>
     <select id="symbol">
       <option value="MNQ">MNQ</option>
       <option value="NQ">NQ</option>
       <option value="ES">ES</option>
-      <option value="MES">Micro ES</option>
+      <option value="Micro ES">Micro ES</option>
       <option value="GC">GC</option>
-      <option value="MGC">Micro GC</option>
+      <option value="Micro GC">Micro GC</option>
     </select>
 
-    <label for="maxRisk">Max Daily Risk ($):</label>
-    <input type="number" id="maxRisk" placeholder="e.g. 1450" />
+    <label>💥 Max Risk for the Day ($)</label>
+    <input type="number" id="maxRisk" placeholder="e.g. 1450">
 
-    <label for="slPoints">Stop Loss (points):</label>
-    <input type="number" id="slPoints" placeholder="e.g. 22" />
+    <label>💰 Risk Per Trade ($)</label>
+    <input type="number" id="riskPerTrade" placeholder="e.g. 600">
 
-    <button onclick="calculateRisk()">Calculate</button>
+    <label>🛡️ Stop Loss (points)</label>
+    <input type="number" id="slPoints" placeholder="e.g. 20">
 
-    <div class="result" id="resultBox" style="display: none;"></div>
+    <button onclick="calculate()">Calculate</button>
+
+    <div class="results" id="output"></div>
   </div>
 
   <script>
-    const tickValues = {
-      MNQ: 2, // $2 per point
-      NQ: 20,
-      ES: 50,
-      MES: 5,
-      GC: 10,
-      MGC: 1
+    const tickMap = {
+      "MNQ": 0.5,
+      "NQ": 2,
+      "ES": 12.5,
+      "Micro ES": 1.25,
+      "GC": 10,
+      "Micro GC": 1
     };
 
-    function calculateRisk() {
-      const symbol = document.getElementById("symbol").value;
-      const maxRisk = parseFloat(document.getElementById("maxRisk").value);
-      const slPoints = parseFloat(document.getElementById("slPoints").value);
+    function calculate() {
+      const symbol = document.getElementById('symbol').value;
+      const maxRisk = parseFloat(document.getElementById('maxRisk').value);
+      const riskPerTrade = parseFloat(document.getElementById('riskPerTrade').value);
+      const slPoints = parseFloat(document.getElementById('slPoints').value);
+      const output = document.getElementById('output');
+      const tickValue = tickMap[symbol];
 
-      if (isNaN(maxRisk) || isNaN(slPoints) || maxRisk <= 0 || slPoints <= 0) {
-        alert("Please enter valid risk and stop loss values.");
+      if (isNaN(maxRisk) || isNaN(riskPerTrade) || isNaN(slPoints)) {
+        output.innerHTML = "<div class='warn'>❌ Please fill out all fields correctly.</div>";
         return;
       }
 
-      const tickValue = tickValues[symbol];
-      const riskPerContract = slPoints * tickValue;
-      const contracts = Math.floor(maxRisk / riskPerContract);
-      const usedRisk = contracts * riskPerContract;
+      if (slPoints > 70) {
+        output.innerHTML = "<div class='warn'>❌ Stop Loss too large. No trade!</div>";
+        return;
+      }
 
-      const tp1 = usedRisk * 1; // RRR 1:1
-      const tp2 = usedRisk * 2;
-      const tp3 = usedRisk * 3;
+      let rrr = 1;
+      if (slPoints <= 21) rrr = 3;
+      else if (slPoints <= 30) rrr = 2.5;
+      else if (slPoints <= 45) rrr = 2;
+      else if (slPoints <= 50) rrr = 1.5;
+      else rrr = 1;
 
-      const result = `
-        <strong>Symbol:</strong> ${symbol}<br>
-        <strong>Stop Loss:</strong> ${slPoints} pts<br>
-        <strong>Contracts:</strong> ${contracts}<br>
-        <strong>Risk Used:</strong> $${usedRisk.toFixed(2)}<br>
-        <strong>Target Profit (1:1):</strong> $${tp1.toFixed(2)}<br>
-        <strong>Target Profit (1:2):</strong> $${tp2.toFixed(2)}<br>
-        <strong>Target Profit (1:3):</strong> $${tp3.toFixed(2)}<br>
+      const oneR = (maxRisk / 1); // Base 1R = Max Daily Risk
+      const tp = riskPerTrade * rrr;
+      const contracts = Math.floor(riskPerTrade / (slPoints * tickValue));
+      const tpPoints = (tp / (contracts * tickValue)).toFixed(2);
+
+      output.innerHTML = `
+        <div>✅ <strong>Contracts:</strong> ${contracts}</div>
+        <div>🎯 <strong>RRR:</strong> 1:${rrr}</div>
+        <div>💰 <strong>Risk:</strong> $${riskPerTrade}</div>
+        <div>📈 <strong>TP:</strong> ${tpPoints} pts = $${tp.toFixed(2)}</div>
       `;
-
-      const box = document.getElementById("resultBox");
-      box.innerHTML = result;
-      box.style.display = "block";
     }
   </script>
 </body>

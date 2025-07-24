@@ -2,70 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RezKai-X Risk Calculator</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
-      background-color: #0e0e0e;
-      font-family: 'Segoe UI', sans-serif;
-      color: #f1f1f1;
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 40px 20px;
+      padding: 40px;
     }
     .calculator {
-      background: #1a1a1a;
+      background: #1c1c1c;
+      border-radius: 10px;
       padding: 30px;
-      border-radius: 12px;
       width: 100%;
-      max-width: 480px;
-      box-shadow: 0 0 10px #000;
+      max-width: 500px;
+      box-shadow: 0 0 15px #000;
     }
-    h2 {
+    .calculator h2 {
       text-align: center;
-      margin-bottom: 20px;
-      color: #0ff;
+      color: #00e7ff;
     }
     label {
       display: block;
-      margin: 10px 0 5px;
+      margin-top: 20px;
       font-weight: bold;
-      color: #ccc;
     }
-    select, input {
+    select,
+    input[type="number"] {
       width: 100%;
       padding: 10px;
-      border: none;
-      border-radius: 6px;
-      background: #2a2a2a;
+      margin-top: 5px;
+      background: #2b2b2b;
       color: #fff;
-      font-size: 16px;
-      margin-bottom: 15px;
+      border: none;
+      border-radius: 5px;
     }
     button {
       width: 100%;
       padding: 12px;
-      background: #0ff;
-      color: #000;
-      font-weight: bold;
+      background: #00faff;
       border: none;
-      border-radius: 6px;
+      margin-top: 25px;
+      font-weight: bold;
+      border-radius: 5px;
       cursor: pointer;
+    }
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      background: #000;
+      border-radius: 8px;
       font-size: 16px;
     }
-    .results {
-      margin-top: 20px;
-      font-size: 17px;
-      background: #111;
-      padding: 15px;
-      border-radius: 8px;
-    }
-    .results div {
-      margin: 8px 0;
-    }
-    .warn {
-      color: red;
+    .highlight {
       font-weight: bold;
     }
   </style>
@@ -76,73 +69,64 @@
 
     <label>Trading Symbol</label>
     <select id="symbol">
-      <option value="MNQ">MNQ</option>
-      <option value="NQ">NQ</option>
-      <option value="ES">ES</option>
-      <option value="Micro ES">Micro ES</option>
-      <option value="GC">GC</option>
-      <option value="Micro GC">Micro GC</option>
+      <option value="2">MNQ</option>
+      <option value="20">NQ</option>
+      <option value="50">ES</option>
+      <option value="5">Micro ES</option>
+      <option value="100">GC</option>
+      <option value="10">Micro GC</option>
     </select>
 
-    <label>💥 Max Risk for the Day ($)</label>
-    <input type="number" id="maxRisk" placeholder="e.g. 1450">
+    <label>🌟 Max Risk for the Day ($)</label>
+    <input type="number" id="maxRisk" placeholder="e.g. 1450" />
 
-    <label>💰 Risk Per Trade ($)</label>
-    <input type="number" id="riskPerTrade" placeholder="e.g. 600">
+    <label>🎯 Daily Target ($)</label>
+    <input type="number" id="target" placeholder="e.g. 1800" />
 
-    <label>🛡️ Stop Loss (points)</label>
-    <input type="number" id="slPoints" placeholder="e.g. 20">
+    <label>📉 Stop Loss (points)</label>
+    <input type="number" id="sl" placeholder="e.g. 12" />
 
     <button onclick="calculate()">Calculate</button>
 
-    <div class="results" id="output"></div>
+    <div class="result" id="result"></div>
   </div>
 
   <script>
-    const tickMap = {
-      "MNQ": 0.5,
-      "NQ": 2,
-      "ES": 12.5,
-      "Micro ES": 1.25,
-      "GC": 10,
-      "Micro GC": 1
-    };
+    function getRRR(sl) {
+      if (sl <= 21) return 3;
+      if (sl <= 30) return 2.5;
+      if (sl <= 45) return 2;
+      if (sl <= 50) return 1.5;
+      if (sl <= 70) return 1;
+      return 0;
+    }
 
     function calculate() {
-      const symbol = document.getElementById('symbol').value;
-      const maxRisk = parseFloat(document.getElementById('maxRisk').value);
-      const riskPerTrade = parseFloat(document.getElementById('riskPerTrade').value);
-      const slPoints = parseFloat(document.getElementById('slPoints').value);
-      const output = document.getElementById('output');
-      const tickValue = tickMap[symbol];
+      const symbol = parseFloat(document.getElementById("symbol").value);
+      const maxRisk = parseFloat(document.getElementById("maxRisk").value);
+      const target = parseFloat(document.getElementById("target").value);
+      const sl = parseFloat(document.getElementById("sl").value);
 
-      if (isNaN(maxRisk) || isNaN(riskPerTrade) || isNaN(slPoints)) {
-        output.innerHTML = "<div class='warn'>❌ Please fill out all fields correctly.</div>";
+      if (!symbol || !maxRisk || !target || !sl) return;
+
+      const rrr = getRRR(sl);
+
+      if (rrr === 0) {
+        document.getElementById("result").innerHTML = `❌ SL too high. Skip this trade.`;
         return;
       }
 
-      if (slPoints > 70) {
-        output.innerHTML = "<div class='warn'>❌ Stop Loss too large. No trade!</div>";
-        return;
-      }
+      const riskPerTrade = target / rrr;
+      const contracts = Math.floor(riskPerTrade / (sl * symbol));
+      const totalRisk = contracts * sl * symbol;
+      const tp = sl * rrr;
+      const tpMoney = contracts * tp * symbol;
 
-      let rrr = 1;
-      if (slPoints <= 21) rrr = 3;
-      else if (slPoints <= 30) rrr = 2.5;
-      else if (slPoints <= 45) rrr = 2;
-      else if (slPoints <= 50) rrr = 1.5;
-      else rrr = 1;
-
-      const oneR = (maxRisk / 1); // Base 1R = Max Daily Risk
-      const tp = riskPerTrade * rrr;
-      const contracts = Math.floor(riskPerTrade / (slPoints * tickValue));
-      const tpPoints = (tp / (contracts * tickValue)).toFixed(2);
-
-      output.innerHTML = `
-        <div>✅ <strong>Contracts:</strong> ${contracts}</div>
-        <div>🎯 <strong>RRR:</strong> 1:${rrr}</div>
-        <div>💰 <strong>Risk:</strong> $${riskPerTrade}</div>
-        <div>📈 <strong>TP:</strong> ${tpPoints} pts = $${tp.toFixed(2)}</div>
+      document.getElementById("result").innerHTML = `
+        ✅ <span class="highlight">Contracts:</span> ${contracts}<br>
+        🎯 <span class="highlight">RRR:</span> 1:${rrr}<br>
+        💰 <span class="highlight">Risk:</span> $${totalRisk.toFixed(2)}<br>
+        📈 <span class="highlight">TP:</span> ${tp.toFixed(2)} pts = $${tpMoney.toFixed(2)}
       `;
     }
   </script>

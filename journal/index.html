@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RezKai-X Trading Journal</title>
+  <link rel="stylesheet" href="../style.css" />
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>📓 RezKai-X Trading Journal</h1>
+
+    <form id="journalForm" class="form">
+      <input type="date" id="date" required />
+      <select id="symbol">
+        <option>MNQ</option><option>NQ</option><option>ES</option><option>MGC</option><option>GC</option>
+      </select>
+      <select id="session">
+        <option>London</option><option>NYSE</option>
+      </select>
+      <input type="text" id="entryTime" placeholder="Entry Time (e.g. 10:01 AM)" required />
+      <input type="text" id="exitTime" placeholder="Exit Time (e.g. 10:14 AM)" required />
+      <select id="direction">
+        <option>Long</option><option>Short</option>
+      </select>
+      <input type="number" id="entryPrice" placeholder="Entry Price" required />
+      <input type="number" id="exitPrice" placeholder="Exit Price" required />
+      <input type="number" id="stopLoss" placeholder="Stop Loss (pts)" />
+      <input type="number" id="takeProfit" placeholder="Take Profit (pts)" />
+      <input type="text" id="result" placeholder="Result (Win/Loss $)" />
+      <input type="text" id="tags" placeholder="Tags (A+, FOMO, etc.)" />
+      <textarea id="notes" placeholder="Notes..."></textarea>
+      <button type="submit">💾 Save Trade</button>
+    </form>
+
+    <hr />
+    <h2>📈 Saved Trades</h2>
+    <ul id="tradeList"></ul>
+  </div>
+</body>
+</html>

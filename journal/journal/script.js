@@ -1,12 +1,16 @@
 const form = document.getElementById("journalForm");
 const tradeList = document.getElementById("tradeList");
 
+// 🔁 Load trades on page load
+window.addEventListener("DOMContentLoaded", loadTrades);
+
 function loadTrades() {
   const trades = JSON.parse(localStorage.getItem("rezkaix_trades") || "[]");
   tradeList.innerHTML = "";
-  trades.forEach((trade, i) => {
+
+  trades.forEach((trade, index) => {
     const li = document.createElement("li");
-    li.textContent = `${trade.date} - ${trade.symbol} - ${trade.direction} - ${trade.result}`;
+    li.textContent = `${trade.date} | ${trade.symbol} | ${trade.direction} | ${trade.result}`;
     tradeList.appendChild(li);
   });
 }
@@ -33,10 +37,8 @@ form.addEventListener("submit", (e) => {
   const trades = JSON.parse(localStorage.getItem("rezkaix_trades") || "[]");
   trades.push(trade);
   localStorage.setItem("rezkaix_trades", JSON.stringify(trades));
-  alert("✅ Trade Saved!");
 
+  alert("✅ Trade saved!");
   form.reset();
-  loadTrades();
+  loadTrades(); // Refresh trade list
 });
-
-loadTrades();

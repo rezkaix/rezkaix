@@ -1,26 +1,28 @@
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("journalForm");
   const tradeList = document.getElementById("tradeList");
 
+  // Load saved trades
   function loadTrades() {
     const trades = JSON.parse(localStorage.getItem("rezkaix_trades") || "[]");
     tradeList.innerHTML = "";
 
     if (trades.length === 0) {
-      tradeList.innerHTML = "<li>No trades saved yet.</li>";
+      tradeList.innerHTML = "<li style='color:gray;'>No trades saved yet.</li>";
       return;
     }
 
-    trades.forEach((trade, i) => {
+    trades.forEach((trade, index) => {
       const li = document.createElement("li");
       li.innerHTML = `
         <strong>${trade.date}</strong> | ${trade.symbol} | ${trade.direction} | ${trade.result}<br />
-        <em>${trade.entryTime} → ${trade.exitTime}</em> | Tags: ${trade.tags}
+        <small>${trade.entryTime} → ${trade.exitTime} | Tags: ${trade.tags}</small>
       `;
       tradeList.appendChild(li);
     });
   }
 
+  // Save trade on submit
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -44,10 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
     trades.push(trade);
     localStorage.setItem("rezkaix_trades", JSON.stringify(trades));
 
-    alert("✅ Trade Saved!");
     form.reset();
     loadTrades();
+    alert("✅ Trade Saved!");
   });
 
-  loadTrades();
+  loadTrades(); // Initial load
 });
